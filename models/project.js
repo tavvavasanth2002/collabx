@@ -10,3 +10,6 @@ var projectSchema=new mongoose.Schema({
 })
 var project=mongoose.model("projects",projectSchema)
 module.exports=project;
+
+
+

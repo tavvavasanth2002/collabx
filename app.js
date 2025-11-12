@@ -1,49 +1,66 @@
+// Core dependencies
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
+var dotenv = require('dotenv');
+var cors = require('cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var mongoose=require("mongoose")
+// Load environment variables
+dotenv.config();
+
+// Initialize Express app
 var app = express();
-var cors=require("cors")
-var dotenv=require("dotenv");
-// view engine setup
+
+
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// Middleware setup
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
+
+// Routes
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use(cors());
 
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
-dotenv.config()
-// error handler
+
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
-var port=4300
-app.listen(port,()=>{
-  console.log(`server running successfully http://localhost:${port}`)
-})
+
+// Start server
+var port = 4300;
+app.listen(port, () => {
+  console.log(` Server running at http://localhost:${port}`);
+});
+// Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/collabx")
-.then(()=>console.log("database connected....."))
-.catch((e)=>console.log(e))
+  .then(() => console.log("Database connected..."))
+  .catch((e) => console.log("Database connection error:", e));
+
+// Export app
 module.exports = app;

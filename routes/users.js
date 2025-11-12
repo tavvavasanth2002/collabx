@@ -54,8 +54,8 @@ router.post("/login",(req,res)=>{
   .then(async (data)=>{
     if(data){
     if(await bcryptjs.compare(req.body.password,data.password)){
-      let token=await jwt.sign({"userid":data._id,"role":data.role},process.env.secret,{expiresIn:"20m"})
-      res.send({"message":"login sucess","token":token,"role":data.role});
+      let token=await jwt.sign({"userid":data._id,"role":data.role,"company":data.company},process.env.secret,{expiresIn:"20m"})
+      res.send({"message":"login sucess","token":token,"role":data.role,"company":data.company,"email":data.email});
     }
     else{
       res.send({"message":"password is wrong"});
