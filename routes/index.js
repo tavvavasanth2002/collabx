@@ -36,7 +36,9 @@ router.post("/sendNotification",(req,res)=>{
 })
 router.get("/emailNotification/:email",async (req,res)=>{
   let name=req.params.email;
-  await notify.find({"fromemail":name}).sort({date:-1})
+  let {page,limit}=req.query
+  let skipnum=(page-1)*limit;
+  await notify.find({"fromemail":name}).sort({date:-1}).skip(skipnum).limit(limit)
   .then((data)=>res.send(data))
   .catch((e)=>console.log(e));
 })
@@ -48,7 +50,7 @@ router.get("/returnemail/:email",async (req,res)=>{
   .then((data)=>res.send(data))
   .catch((e)=>console.log(e))
 })
-//project
+//project venor side
 router.get("/completedProjects/:company",(req,res)=>{
   let company=req.params.company
   project.find({"projectStatus":"completed","vendorCompany":company})
@@ -79,6 +81,32 @@ router.put("/updateProject/:name",(req,res)=>{
   project.findOneAndReplace({"projectName":name},req.body)
   .then(()=>res.send({"message":"updated the project"}))
   .catch((e)=>console.log(e));
+})
+
+//project parent side
+router.get("/parentCompletedProjects/:company",(req,res)=>{
+  let company=req.params.company
+  project.find({"projectStatus":"completed","parentCompany":company})
+  .then((data)=>res.send(data))
+  .catch((e)=>console.log(e))
+})
+router.get("/parentProgressProjects/:company",(req,res)=>{
+  let company=req.params.company
+  project.find({"projectStatus":"progress","parentCompany":company})
+  .then((data)=>res.send(data))
+  .catch((e)=>console.log(e))
+})
+router.get("/parentRejectProjects/:company",(req,res)=>{
+  let company=req.params.company
+  project.find({"projectStatus":"reject","parentCompany":company})
+  .then((data)=>res.send(data))
+  .catch((e)=>console.log(e))
+})
+router.get("/parentUndecidedProjects/:company",(req,res)=>{
+  let company=req.params.company
+  project.find({"projectStatus":"undecided","parentCompany":company})
+  .then((data)=>res.send(data))
+  .catch((e)=>console.log(e))
 })
 
 module.exports = router;
